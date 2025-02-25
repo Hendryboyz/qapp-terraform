@@ -7,11 +7,11 @@ resource "aws_security_group" "ecs_container_instance" {
 
   ingress = [
     {
-      description = "Allow client ingress traffic from ALB on HTTP only"
-      from_port   = 3000
-      to_port     = 3000
-      protocol    = "tcp"
-      security_groups = [ aws_security_group.alb.id ]
+      description      = "Allow client ingress traffic from ALB on HTTP only"
+      from_port        = 3000
+      to_port          = 3000
+      protocol         = "tcp"
+      security_groups  = [aws_security_group.alb.id]
       self             = true
       security_groups  = []
       ipv6_cidr_blocks = []
@@ -19,11 +19,11 @@ resource "aws_security_group" "ecs_container_instance" {
       cidr_blocks      = []
     },
     {
-      description = "Allow backend ingress traffic from ALB on HTTP only"
-      from_port   = 4200
-      to_port     = 4200
-      protocol    = "tcp"
-      security_groups = [ aws_security_group.alb.id ]
+      description      = "Allow backend ingress traffic from ALB on HTTP only"
+      from_port        = 4200
+      to_port          = 4200
+      protocol         = "tcp"
+      security_groups  = [aws_security_group.alb.id]
       self             = true
       security_groups  = []
       ipv6_cidr_blocks = []
@@ -41,7 +41,7 @@ resource "aws_security_group" "ecs_container_instance" {
   }
 
   tags = {
-    Name = "${var.app_name}-ECS_Task-SecurityGroup"
+    Name        = "${var.app_name}-${var.environment}-ECS_Task-SecurityGroup"
     Environment = var.environment
   }
 }
@@ -61,7 +61,7 @@ resource "aws_security_group" "alb" {
   }
 
   tags = {
-    Name     = "${var.app_name}-ALB-SecurityGroup"
+    Name        = "${var.app_name}-${var.environment}-ALB-SecurityGroup"
     Environment = var.environment
   }
 }
