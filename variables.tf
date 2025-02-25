@@ -7,3 +7,8 @@ variable "environment" {
   type    = string
   default = "dev"
 }
+
+variable "resource_region" {
+  type    = string
+  default = "ap-northeast-1"
+}

@@ -17,11 +17,11 @@ terraform {
 
   backend "s3" {
     bucket = "terraform-state-qapp"
-    key    = "dev.tfstate"
+    key    = ""
     region = "ap-northeast-1" # Japan
   }
 }
 
 provider "aws" {
-  region = "ap-northeast-1"
+  region = var.resource_region
 }
