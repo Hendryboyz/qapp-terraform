@@ -7,25 +7,17 @@ resource "aws_ecs_cluster" "app_cluster" {
   }
 }
 
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [aws_default_vpc.default.id]
-  }
-}
-
-
 resource "aws_ecs_service" "client" {
   name        = "${var.app_name}-${var.environment}-client-service"
   cluster     = aws_ecs_cluster.app_cluster.id
   launch_type = "FARGATE"
   task_definition = aws_ecs_task_definition.client_task.arn
 
-  load_balancer {
-    target_group_arn = aws_alb_target_group.client_target_group.arn
-    container_name   = "client-app"
-    container_port   = 4200
-  }
+  # load_balancer {
+  #   target_group_arn = aws_alb_target_group.client_target_group.arn
+  #   container_name   = "client-app"
+  #   container_port   = 4200
+  # }
 
   network_configuration {
     security_groups = [aws_security_group.ecs_container_instance.id]
@@ -40,11 +32,11 @@ resource "aws_ecs_service" "backend" {
   launch_type = "FARGATE"
   task_definition = aws_ecs_task_definition.backend_task.arn
 
-  load_balancer {
-    target_group_arn = aws_alb_target_group.backend_target_group.arn
-    container_name   = "backend-app"
-    container_port   = 3000
-  }
+  # load_balancer {
+  #   target_group_arn = aws_alb_target_group.backend_target_group.arn
+  #   container_name   = "backend-app"
+  #   container_port   = 3000
+  # }
 
   network_configuration {
     security_groups = [aws_security_group.ecs_container_instance.id]

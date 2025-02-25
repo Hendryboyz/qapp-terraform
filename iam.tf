@@ -8,7 +8,7 @@ resource "aws_iam_openid_connect_provider" "github_oidc" {
 
 ## IAM Role for ECS Task execution
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "ECS_TaskExecutionRole_${var.environment}"
+  name               = "${var.app_name}-${var.environment}-ECS-task_execution_role"
   assume_role_policy = data.aws_iam_policy_document.task_assume_role_policy.json
 }
 
@@ -29,6 +29,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 }
 
 resource "aws_iam_role" "ecs_task_iam_role" {
-  name               = "ECS_TaskIAMRole_${var.environment}"
+  name               = "${var.app_name}-${var.environment}-ECS_task-iam_role"
   assume_role_policy = data.aws_iam_policy_document.task_assume_role_policy.json
 }
