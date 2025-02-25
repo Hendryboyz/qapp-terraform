@@ -19,6 +19,7 @@ resource "aws_ecs_service" "client" {
   name        = "${var.app_name}-${var.environment}-client-service"
   cluster     = aws_ecs_cluster.app_cluster.id
   launch_type = "FARGATE"
+  task_definition = aws_ecs_task_definition.client_task.arn
 
   load_balancer {
     target_group_arn = aws_alb_target_group.client_target_group.arn
@@ -37,6 +38,7 @@ resource "aws_ecs_service" "backend" {
   name        = "${var.app_name}-${var.environment}-backend-service"
   cluster     = aws_ecs_cluster.app_cluster.id
   launch_type = "FARGATE"
+  task_definition = aws_ecs_task_definition.backend_task.arn
 
   load_balancer {
     target_group_arn = aws_alb_target_group.backend_target_group.arn
@@ -65,14 +67,14 @@ resource "aws_ecs_task_definition" "client_task" {
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_iam_role.arn
-  cpu                      = 5
-  memory                   = 256
+  cpu                      = 256
+  memory                   = 512
   container_definitions = jsonencode([
     {
       name      = "client-app"
       image     = "${aws_ecr_repository.client.repository_url}:latest"
-      cpu       = 5
-      memory    = 256
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
@@ -91,14 +93,14 @@ resource "aws_ecs_task_definition" "backend_task" {
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_iam_role.arn
-  cpu                      = 5
-  memory                   = 256
+  cpu                      = 256
+  memory                   = 512
   container_definitions = jsonencode([
     {
       name      = "backend-app"
       image     = "${aws_ecr_repository.backend.repository_url}:latest"
-      cpu       = 5
-      memory    = 256
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
