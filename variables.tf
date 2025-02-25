@@ -21,3 +21,13 @@ variable "subnets" {
 variable "hostname" {
   type = string
 }
+
+variable "db_username" {
+  type    = string
+  default = "postgres"
+}
+
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
