@@ -22,6 +22,17 @@ variable "hostname" {
   type = string
 }
 
+variable "is_postgres_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "postgres_snapshot_id" {
+  type        = string
+  description = "allow to recreate the PostgreSQL with the same data from recycled DB"
+  default     = null
+}
+
 variable "db_username" {
   type    = string
   default = "postgres"
