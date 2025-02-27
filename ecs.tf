@@ -21,12 +21,12 @@ resource "aws_ecs_service" "client" {
   }
 
   network_configuration {
-    security_groups = [aws_security_group.ecs_container_instance.id]
-    subnets         = toset(data.aws_subnets.default.ids)
+    security_groups  = [aws_security_group.ecs_container_instance.id]
+    subnets          = toset(data.aws_subnets.default.ids)
     assign_public_ip = true
   }
 
-  
+
 }
 
 resource "aws_ecs_service" "backend" {
@@ -43,8 +43,8 @@ resource "aws_ecs_service" "backend" {
   }
 
   network_configuration {
-    security_groups = [aws_security_group.ecs_container_instance.id]
-    subnets         = toset(data.aws_subnets.default.ids)
+    security_groups  = [aws_security_group.ecs_container_instance.id]
+    subnets          = toset(data.aws_subnets.default.ids)
     assign_public_ip = true
   }
 }
@@ -95,7 +95,7 @@ resource "aws_ecs_task_definition" "client_task" {
       ]
       logConfiguration = {
         logDriver = "awslogs",
-        options   = {
+        options = {
           "awslogs-group"         = "${aws_cloudwatch_log_group.client_log_group.name}",
           "awslogs-region"        = "${var.resource_region}",
           "awslogs-stream-prefix" = "qapp_client-log-stream-${var.environment}"
@@ -150,7 +150,7 @@ resource "aws_ecs_task_definition" "backend_task" {
       ]
       logConfiguration = {
         logDriver = "awslogs",
-        options   = {
+        options = {
           "awslogs-group"         = "${aws_cloudwatch_log_group.backend_log_group.name}",
           "awslogs-region"        = "${var.resource_region}",
           "awslogs-stream-prefix" = "qapp_backend-log-stream-${var.environment}"

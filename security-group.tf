@@ -11,7 +11,7 @@ resource "aws_security_group" "ecs_container_instance" {
       from_port        = 3000
       to_port          = 3000
       protocol         = "tcp"
-      security_groups  = [ "${aws_security_group.alb.id}" ]
+      security_groups  = ["${aws_security_group.alb.id}"]
       self             = true
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
@@ -32,7 +32,7 @@ resource "aws_security_group" "ecs_container_instance" {
     Environment = var.environment
   }
 
-  depends_on = [ aws_security_group.alb ]
+  depends_on = [aws_security_group.alb]
 }
 
 ## Security Group for ALB
