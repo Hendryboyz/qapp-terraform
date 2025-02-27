@@ -43,7 +43,7 @@ resource "aws_lb_target_group" "backend_target_group" {
     unhealthy_threshold = 2
     interval            = 60
     matcher             = "404"
-    path                = "/api"
+    path                = "/backend/api"
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = 30
