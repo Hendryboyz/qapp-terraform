@@ -56,30 +56,34 @@ resource "aws_lb_target_group" "backend_target_group" {
 
 resource "aws_lb_listener" "http_listener" {
   load_balancer_arn = aws_alb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.alb_certificate.arn
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.client_target_group.arn
   }
+
+  depends_on = [aws_acm_certificate.alb_certificate]
 }
 
-resource "aws_lb_listener_rule" "client_rule" {
-  listener_arn = aws_lb_listener.http_listener.arn
-  priority     = 100
+# resource "aws_lb_listener_rule" "client_rule" {
+#   listener_arn = aws_lb_listener.http_listener.arn
+#   priority     = 100
 
-  condition {
-    path_pattern {
-      values = ["/client/*"]
-    }
-  }
+#   condition {
+#     path_pattern {
+#       values = ["/client/*"]
+#     }
+#   }
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.client_target_group.arn
-  }
-}
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.client_target_group.arn
+#   }
+# }
 
 resource "aws_lb_listener_rule" "backend_rule" {
   listener_arn = aws_lb_listener.http_listener.arn

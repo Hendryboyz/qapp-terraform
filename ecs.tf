@@ -162,6 +162,12 @@ resource "aws_ecs_task_definition" "backend_task" {
           "awslogs-stream-prefix" = "qapp_backend-log-stream-${var.environment}"
         }
       }
+      environmentFiles = [
+        {
+          value = "arn:aws:s3:::qapp-dev-configs-bucket/.dev.env",
+          type  = "s3"
+        }
+      ]
       # mountPoints = [
       #   {
       #     sourceVolume  = "configs-storage"
