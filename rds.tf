@@ -7,6 +7,20 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
+resource "aws_db_parameter_group" "pg15" {
+  name_prefix = "${var.app_name}-${var.environment}-pg15-params"
+  family      = "postgres15"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "0"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_db_instance" "postgres-db-instance" {
   count                     = var.is_postgres_enabled ? 1 : 0
   allocated_storage         = 20
@@ -23,6 +37,7 @@ resource "aws_db_instance" "postgres-db-instance" {
   username                  = var.db_username
   apply_immediately         = true
   db_subnet_group_name      = aws_db_subnet_group.default.name
+  parameter_group_name = aws_db_parameter_group.pg15.name
 
   tags = {
     Environment = var.environment
