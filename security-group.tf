@@ -7,9 +7,20 @@ resource "aws_security_group" "ecs_container_instance" {
 
   ingress = [
     {
-      description      = "Allow client ingress traffic from ALB on 3000 only"
+      description      = "Allow client ingress traffic from ALB on 3000"
       from_port        = 3000
       to_port          = 3000
+      protocol         = "tcp"
+      security_groups  = ["${aws_security_group.alb.id}"]
+      self             = true
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      cidr_blocks      = []
+    },
+    {
+      description      = "Allow client ingress traffic from ALB on 80"
+      from_port        = 80
+      to_port          = 80
       protocol         = "tcp"
       security_groups  = ["${aws_security_group.alb.id}"]
       self             = true

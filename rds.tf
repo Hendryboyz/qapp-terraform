@@ -37,7 +37,7 @@ resource "aws_db_instance" "postgres-db-instance" {
   username                  = var.db_username
   apply_immediately         = true
   db_subnet_group_name      = aws_db_subnet_group.default.name
-  parameter_group_name = aws_db_parameter_group.pg15.name
+  parameter_group_name      = aws_db_parameter_group.pg15.name
 
   tags = {
     Environment = var.environment

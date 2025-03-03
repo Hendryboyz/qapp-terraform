@@ -30,6 +30,28 @@ resource "aws_lb_target_group" "client_target_group" {
   depends_on = [aws_alb.alb]
 }
 
+resource "aws_lb_target_group" "backoffice_target_group" {
+  name                 = "${var.app_name}-${var.environment}-backoffice-targetgroup"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = aws_default_vpc.default.id
+  deregistration_delay = 5
+  target_type          = "ip"
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    interval            = 60
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 30
+  }
+
+  depends_on = [aws_alb.alb]
+}
+
 resource "aws_lb_target_group" "backend_target_group" {
   name                 = "${var.app_name}-${var.environment}-backend-targetgroup"
   port                 = 3000
@@ -98,5 +120,21 @@ resource "aws_lb_listener_rule" "backend_rule" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backend_target_group.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "backoffice_rule" {
+  listener_arn = aws_lb_listener.http_listener.arn
+  priority     = 300
+
+  condition {
+    path_pattern {
+      values = ["/bo/*"]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backoffice_target_group.arn
   }
 }
