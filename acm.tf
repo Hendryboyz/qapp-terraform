@@ -2,6 +2,10 @@ resource "aws_acm_certificate" "alb_certificate" {
   domain_name               = var.hostname
   validation_method         = "DNS"
   subject_alternative_names = ["*.${var.hostname}"]
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_acm_certificate_validation" "alb_certificate" {

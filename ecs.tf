@@ -5,6 +5,10 @@ resource "aws_ecs_cluster" "app_cluster" {
     name  = "containerInsights"
     value = "enabled"
   }
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_ecs_service" "client" {
@@ -26,7 +30,9 @@ resource "aws_ecs_service" "client" {
     assign_public_ip = true
   }
 
-
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_ecs_service" "backend" {
@@ -46,6 +52,10 @@ resource "aws_ecs_service" "backend" {
     security_groups  = [aws_security_group.ecs_container_instance.id]
     subnets          = toset(data.aws_subnets.default.ids)
     assign_public_ip = true
+  }
+
+  tags = {
+    Environment = var.environment
   }
 }
 
@@ -67,6 +77,10 @@ resource "aws_ecs_service" "backoffice" {
     subnets          = toset(data.aws_subnets.default.ids)
     assign_public_ip = true
   }
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 ## Creates ECS Task Definition
@@ -78,8 +92,12 @@ locals {
 }
 
 resource "aws_cloudwatch_log_group" "client_log_group" {
-  name              = "/${lower(var.app_name)}/ecs/client"
+  name              = "/${lower(var.app_name)}/${lower(var.environment)}/ecs/client"
   retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_ecs_task_definition" "client_task" {
@@ -90,9 +108,11 @@ resource "aws_ecs_task_definition" "client_task" {
   task_role_arn            = aws_iam_role.ecs_task_iam_role.arn
   cpu                      = 256
   memory                   = 512
+
   volume {
     name = "configs-storage"
   }
+
   container_definitions = jsonencode([
     {
       name      = "client-app"
@@ -136,11 +156,19 @@ resource "aws_ecs_task_definition" "client_task" {
       # ]
     }
   ])
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_cloudwatch_log_group" "backoffice_log_group" {
-  name              = "/${lower(var.app_name)}/ecs/backoffice"
+  name              = "/${lower(var.app_name)}/${lower(var.environment)}/ecs/backoffice"
   retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_ecs_task_definition" "backoffice_task" {
@@ -151,9 +179,11 @@ resource "aws_ecs_task_definition" "backoffice_task" {
   task_role_arn            = aws_iam_role.ecs_task_iam_role.arn
   cpu                      = 256
   memory                   = 512
+
   volume {
     name = "configs-storage"
   }
+
   container_definitions = jsonencode([
     {
       name      = "backoffice-app"
@@ -176,19 +206,21 @@ resource "aws_ecs_task_definition" "backoffice_task" {
           "awslogs-stream-prefix" = "qapp_backend-log-stream-${var.environment}"
         }
       }
-      environmentFiles = [
-        {
-          value = "arn:aws:s3:::qapp-dev-configs-bucket/.dev.env",
-          type  = "s3"
-        }
-      ]
     }
   ])
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_cloudwatch_log_group" "backend_log_group" {
-  name              = "/${lower(var.app_name)}/ecs/backend"
+  name              = "/${lower(var.app_name)}/${lower(var.environment)}/ecs/backend"
   retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_ecs_task_definition" "backend_task" {
@@ -199,9 +231,11 @@ resource "aws_ecs_task_definition" "backend_task" {
   task_role_arn            = aws_iam_role.ecs_task_iam_role.arn
   cpu                      = 256
   memory                   = 512
+
   volume {
     name = "configs-storage"
   }
+
   container_definitions = jsonencode([
     {
       name      = "backend-app"
@@ -245,4 +279,8 @@ resource "aws_ecs_task_definition" "backend_task" {
       # ]
     }
   ])
+
+  tags = {
+    Environment = var.environment
+  }
 }

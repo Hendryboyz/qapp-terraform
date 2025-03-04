@@ -4,6 +4,10 @@ resource "aws_alb" "alb" {
   name            = "${var.app_name}-${var.environment}-alb"
   security_groups = [aws_security_group.alb.id]
   subnets         = toset(data.aws_subnets.default.ids)
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 ## Creates the Target Group for our service
@@ -25,6 +29,10 @@ resource "aws_lb_target_group" "client_target_group" {
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = 30
+  }
+
+  tags = {
+    Environment = var.environment
   }
 
   depends_on = [aws_alb.alb]
@@ -49,6 +57,10 @@ resource "aws_lb_target_group" "backoffice_target_group" {
     timeout             = 30
   }
 
+  tags = {
+    Environment = var.environment
+  }
+
   depends_on = [aws_alb.alb]
 }
 
@@ -71,6 +83,10 @@ resource "aws_lb_target_group" "backend_target_group" {
     timeout             = 30
   }
 
+  tags = {
+    Environment = var.environment
+  }
+
   depends_on = [aws_alb.alb]
 }
 
@@ -88,24 +104,12 @@ resource "aws_lb_listener" "http_listener" {
     target_group_arn = aws_lb_target_group.client_target_group.arn
   }
 
+  tags = {
+    Environment = var.environment
+  }
+
   depends_on = [aws_acm_certificate.alb_certificate]
 }
-
-# resource "aws_lb_listener_rule" "client_rule" {
-#   listener_arn = aws_lb_listener.http_listener.arn
-#   priority     = 100
-
-#   condition {
-#     path_pattern {
-#       values = ["/client/*"]
-#     }
-#   }
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.client_target_group.arn
-#   }
-# }
 
 resource "aws_lb_listener_rule" "backend_rule" {
   listener_arn = aws_lb_listener.http_listener.arn
@@ -120,6 +124,10 @@ resource "aws_lb_listener_rule" "backend_rule" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backend_target_group.arn
+  }
+
+  tags = {
+    Environment = var.environment
   }
 }
 
@@ -136,5 +144,9 @@ resource "aws_lb_listener_rule" "backoffice_rule" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backoffice_target_group.arn
+  }
+
+  tags = {
+    Environment = var.environment
   }
 }
