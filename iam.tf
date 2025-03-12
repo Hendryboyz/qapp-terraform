@@ -33,6 +33,34 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_s3_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
+data "aws_iam_policy_document" "task_write_s3_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.app_name}-${var.environment}-assets-bucket",
+      "arn:aws:s3:::${var.app_name}-${var.environment}-assets-bucket/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "task_write_s3_policy" {
+  name   = "${var.app_name}-${var.environment}-assets-s3_rw_policy"
+  policy = data.aws_iam_policy_document.task_write_s3_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.task_write_s3_policy.arn
+}
+
 resource "aws_iam_role" "ecs_task_iam_role" {
   name               = "${var.app_name}-${var.environment}-ECS_task-iam_role"
   assume_role_policy = data.aws_iam_policy_document.task_assume_role_policy.json
@@ -62,7 +90,7 @@ resource "aws_iam_policy" "sms_cloudwatch_dest_policy" {
 }
 
 resource "aws_iam_role" "sms_cloudwatch_role" {
-  name               = "${var.app_name}-${var.environment}-SMS-cloudwatch-role"
+  name = "${var.app_name}-${var.environment}-SMS-cloudwatch-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
