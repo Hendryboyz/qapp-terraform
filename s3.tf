@@ -25,3 +25,20 @@ resource "aws_s3_bucket_cors_configuration" "assets_bucket_cors" {
     max_age_seconds = 3000
   }
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "tmp_assets_lifecycle" {
+  bucket = aws_s3_bucket.assets_bucket.id
+
+  rule {
+    id     = "expire_tmp_objects"
+    status = "Enabled"
+
+    filter {
+      prefix = "tmp/"
+    }
+
+    expiration {
+      days = 1  # Deletes objects after 1 day
+    }
+  }
+}
