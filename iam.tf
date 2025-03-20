@@ -109,3 +109,17 @@ resource "aws_iam_role_policy_attachment" "sms_cloudwatch_role_dest_policy" {
   role       = aws_iam_role.sms_cloudwatch_role.name
   policy_arn = aws_iam_policy.sms_cloudwatch_dest_policy.arn
 }
+
+## IAM user for SDK
+
+resource "aws_iam_user" "local_developer" {
+  name = "${var.app_name}-${var.environment}-local_developer"
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+# resource "aws_iam_access_key" "local_developer" {
+#   user = aws_iam_user.local_developer.name
+# }
