@@ -57,7 +57,7 @@ resource "aws_iam_policy" "task_write_s3_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+  role       = aws_iam_role.ecs_task_iam_role.name
   policy_arn = aws_iam_policy.task_write_s3_policy.arn
 }
 
