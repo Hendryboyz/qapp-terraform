@@ -25,7 +25,7 @@ resource "aws_db_instance" "postgres-db-instance" {
   count                     = var.is_postgres_enabled ? 1 : 0
   allocated_storage         = 20
   engine                    = "postgres"
-  engine_version            = "15.10"
+  engine_version            = "15.12"
   identifier                = "${var.app_name}-${var.environment}-postgres-db"
   instance_class            = "db.t3.micro"
   password                  = var.db_password

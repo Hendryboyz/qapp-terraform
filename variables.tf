@@ -42,3 +42,13 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+
+variable "is_ses_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ses_from_subdomain" {
+  type    = string
+  default = "no-reply"
+}
