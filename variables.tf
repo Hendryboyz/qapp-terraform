@@ -50,5 +50,5 @@ variable "is_ses_enabled" {
 
 variable "ses_from_subdomain" {
   type    = string
-  default = "no-reply"
+  default = "support"
 }
