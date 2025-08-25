@@ -108,7 +108,7 @@ resource "aws_lb_listener" "http_listener" {
     Environment = var.environment
   }
 
-  depends_on = [aws_acm_certificate.alb_certificate]
+  depends_on = [aws_acm_certificate.alb_certificate, aws_acm_certificate_validation.alb_certificate]
 }
 
 resource "aws_lb_listener_rule" "backend_rule" {
