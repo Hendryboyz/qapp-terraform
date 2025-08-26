@@ -89,5 +89,5 @@ resource "aws_cloudfront_distribution" "assets_s3_distribution" {
     Environment = var.environment
   }
 
-  depends_on = [ aws_acm_certificate.assets_cloudfront_certificate, aws_acm_certificate_validation.assets_cloudfront_certificate ]
+  depends_on = [aws_acm_certificate.assets_cloudfront_certificate, aws_acm_certificate_validation.assets_cloudfront_certificate]
 }
