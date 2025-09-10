@@ -33,6 +33,12 @@ resource "aws_ecs_service" "client" {
   tags = {
     Environment = var.environment
   }
+
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+    ]
+  }
 }
 
 resource "aws_ecs_service" "backend" {
@@ -57,6 +63,12 @@ resource "aws_ecs_service" "backend" {
   tags = {
     Environment = var.environment
   }
+
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+    ]
+  }
 }
 
 resource "aws_ecs_service" "backoffice" {
@@ -80,6 +92,12 @@ resource "aws_ecs_service" "backoffice" {
 
   tags = {
     Environment = var.environment
+  }
+
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+    ]
   }
 }
 
