@@ -137,7 +137,10 @@ resource "aws_lb_listener_rule" "backoffice_rule" {
 
   condition {
     path_pattern {
-      values = ["/bo/*"]
+      values = [
+        "/bo",
+        "/bo/*",
+      ]
     }
   }
 
