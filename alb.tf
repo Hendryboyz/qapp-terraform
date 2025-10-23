@@ -38,6 +38,34 @@ resource "aws_lb_target_group" "client_target_group" {
   depends_on = [aws_alb.alb]
 }
 
+resource "aws_lb_target_group" "demo_client_target_group" {
+  count = var.is_demo_page_enabled ? 1 : 0
+
+  name                 = "${var.app_name}-${var.environment}-demo-client-targetgroup"
+  port                 = 3000
+  protocol             = "HTTP"
+  vpc_id               = aws_default_vpc.default.id
+  deregistration_delay = 5
+  target_type          = "ip"
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    interval            = 60
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 30
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+
+  depends_on = [aws_alb.alb]
+}
+
 resource "aws_lb_target_group" "backoffice_target_group" {
   name                 = "${var.app_name}-${var.environment}-backoffice-targetgroup"
   port                 = 80
@@ -111,6 +139,7 @@ resource "aws_lb_listener" "http_listener" {
   depends_on = [aws_acm_certificate.alb_certificate, aws_acm_certificate_validation.alb_certificate]
 }
 
+
 resource "aws_lb_listener_rule" "backend_rule" {
   listener_arn = aws_lb_listener.http_listener.arn
   priority     = 200
@@ -147,6 +176,28 @@ resource "aws_lb_listener_rule" "backoffice_rule" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backoffice_target_group.arn
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_lb_listener_rule" "demo_client_rule" {
+  count = var.is_demo_page_enabled ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_listener.arn
+  priority     = 400
+
+  condition {
+    host_header {
+      values = ["v2.${var.hostname}"]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.demo_client_target_group[0].arn
   }
 
   tags = {

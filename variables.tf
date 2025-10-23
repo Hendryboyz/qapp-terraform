@@ -52,3 +52,8 @@ variable "ses_from_subdomain" {
   type    = string
   default = "support"
 }
+
+variable "is_demo_page_enabled" {
+  type    = bool
+  default = false
+}

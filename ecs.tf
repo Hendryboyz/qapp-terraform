@@ -41,6 +41,37 @@ resource "aws_ecs_service" "client" {
   }
 }
 
+resource "aws_ecs_service" "demo_client" {
+  count           = var.is_demo_page_enabled ? 1 : 0
+  name            = "${var.app_name}-${var.environment}-demo-client-service"
+  cluster         = aws_ecs_cluster.app_cluster.id
+  launch_type     = "FARGATE"
+  task_definition = aws_ecs_task_definition.demo_client_task[0].arn
+  desired_count   = 1
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.demo_client_target_group[0].arn
+    container_name   = "demo-client-app"
+    container_port   = 3000
+  }
+
+  network_configuration {
+    security_groups  = [aws_security_group.ecs_container_instance.id]
+    subnets          = toset(data.aws_subnets.default.ids)
+    assign_public_ip = true
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+    ]
+  }
+}
+
 resource "aws_ecs_service" "backend" {
   name            = "${var.app_name}-${var.environment}-backend-service"
   cluster         = aws_ecs_cluster.app_cluster.id
@@ -175,6 +206,82 @@ resource "aws_ecs_task_definition" "client_task" {
   tags = {
     Environment = var.environment
   }
+}
+
+resource "aws_cloudwatch_log_group" "demo_client_group" {
+  count = var.is_demo_page_enabled ? 1 : 0
+
+  name              = "/${lower(var.app_name)}/${lower(var.environment)}/ecs/demo_client"
+  retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_ecs_task_definition" "demo_client_task" {
+  count = var.is_demo_page_enabled ? 1 : 0
+
+  family                   = "${var.app_name}-${var.environment}-demo-client-definition"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_iam_role.arn
+  cpu                      = 256
+  memory                   = 512
+
+  volume {
+    name = "configs-storage"
+  }
+
+  container_definitions = jsonencode([
+    {
+      name      = "demo-client-app"
+      image     = "${aws_ecr_repository.demo-client[0].repository_url}:latest"
+      cpu       = 256
+      memory    = 512
+      essential = true
+      # dependsOn = [
+      #   {
+      #     containerName = "init"
+      #     condition     = "SUCCESS"
+      #   }
+      # ]
+      portMappings = [
+        {
+          containerPort = 3000
+          hostPort      = 3000
+          protocol      = "tcp"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = "${aws_cloudwatch_log_group.demo_client_group[0].name}",
+          "awslogs-region"        = "${var.resource_region}",
+          "awslogs-stream-prefix" = "qapp_demo_client-log-stream-${var.environment}"
+        }
+      }
+      environmentFiles = [
+        {
+          value = "arn:aws:s3:::qapp-dev-configs-bucket/.dev.env",
+          type  = "s3"
+        }
+      ]
+      # mountPoints = [
+      #   {
+      #     sourceVolume  = "configs-storage"
+      #     readOnly      = false
+      #     containerPath = "/app/configs"
+      #   }
+      # ]
+    }
+  ])
+
+  tags = {
+    Environment = var.environment
+  }
+
 }
 
 resource "aws_cloudwatch_log_group" "backoffice_log_group" {
